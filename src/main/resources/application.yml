@@ -17,3 +17,10 @@ spring:
         use_sql_comments: true
         jdbc:
           batch_size: 1000
+
+jwt:
+  token:
+    secretKey: ${JWT_SECRET_KEY}
+    expiration:
+      access: ${JWT_ACCESS_TOKEN_TIME}
+      refresh: ${JWT_REFRESH_TOKEN_TIME}
