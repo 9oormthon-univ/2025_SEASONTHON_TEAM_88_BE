@@ -7,10 +7,7 @@ import com.eventory.server.global.apipayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -33,5 +30,11 @@ public class MemberController {
     @PostMapping("/auth/login")
     public ApiResponse<MemberResponseDTO.LoginResultDTO> localLogin (@RequestBody MemberRequestDTO.LoginDTO request){
         return ApiResponse.onSuccess(memberCommandService.loginMember(request));
+    }
+
+    @Operation(summary = "카카오 로그인 API", description = "카카오 로그인 및 회원 가입을 진행하는 API입니다. 인가코드를 넘겨주세요.")
+    @GetMapping("/auth/kakao")
+    public ApiResponse<MemberResponseDTO.LoginResultDTO> kakaoLogin(@RequestParam("code") String code) {
+        return ApiResponse.onSuccess(memberCommandService.kakaoLogin(code));
     }
 }

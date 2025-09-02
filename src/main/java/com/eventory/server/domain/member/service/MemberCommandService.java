@@ -1,13 +1,17 @@
 package com.eventory.server.domain.member.service;
 
 import com.eventory.server.domain.member.converter.MemberConverter;
+import com.eventory.server.domain.member.dto.KakaoProfile;
 import com.eventory.server.domain.member.dto.MemberRequestDTO;
 import com.eventory.server.domain.member.dto.MemberResponseDTO;
+import com.eventory.server.domain.member.dto.OAuthToken;
 import com.eventory.server.domain.member.entity.LoginInfo;
 import com.eventory.server.domain.member.entity.Member;
 import com.eventory.server.domain.member.repository.LoginInfoRepository;
 import com.eventory.server.domain.member.repository.MemberRepository;
 import com.eventory.server.global.apipayload.code.status.ErrorStatus;
+import com.eventory.server.global.apipayload.exception.authProvider.KakaoAuthProvider;
+import com.eventory.server.global.apipayload.exception.handler.AuthException;
 import com.eventory.server.global.apipayload.exception.handler.MemberHandler;
 import com.eventory.server.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +34,7 @@ public class MemberCommandService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final KakaoAuthProvider kakaoAuthProvider;
 
     @Value("${jwt.token.expiration.refresh}")
     private long refreshTokenExpiration;
@@ -92,6 +98,56 @@ public class MemberCommandService {
                 accessToken,
                 refreshToken
         );
+    }
+
+    // 카카오 로그인
+    @Transactional
+    public MemberResponseDTO.LoginResultDTO kakaoLogin(String code) {
+        OAuthToken oAuthToken = getKakaoOauthToken(code);
+
+        KakaoProfile kakaoProfile;
+        try {
+            kakaoProfile = kakaoAuthProvider.requestKakaoProfile(oAuthToken.getAccess_token());
+        } catch (Exception e) {
+            throw new AuthException(ErrorStatus.INVALID_REQUEST_INFO_KAKAO);
+        }
+
+        Optional<LoginInfo> userLoginInfo = loginInfoRepository.findByUsername("KAKAO_" + kakaoProfile.getId());
+
+        if (userLoginInfo.isPresent()) {
+            LoginInfo logininfo = userLoginInfo.get();
+            return getOauthResponseForMember(logininfo);
+        }
+
+        Member member = memberRepository.save(MemberConverter.kakaoToMember(kakaoProfile));
+        LoginInfo loginInfo = loginInfoRepository.save(MemberConverter.toKakaoLoginInfo(kakaoProfile,member));
+
+        return getOauthResponseForMember(loginInfo);
+    }
+
+    private OAuthToken getKakaoOauthToken(String code) {
+        OAuthToken oAuthToken;
+        try {
+            oAuthToken = kakaoAuthProvider.requestToken(code);
+        } catch (Exception e) {
+            throw new AuthException(ErrorStatus.AUTH_INVALID_CODE);
+        }
+        return oAuthToken;
+    }
+
+    private MemberResponseDTO.LoginResultDTO getOauthResponseForMember(LoginInfo loginInfo) {
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                loginInfo.getUsername(),
+                null,
+                Collections.emptyList());
+
+        Member loginMember = loginInfo.getMember();
+
+        String accessToken = jwtTokenProvider.createAccessToken(authentication);
+        String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+
+        return MemberConverter.toLoginResultDTO(loginMember.getId(), accessToken, refreshToken);
     }
 
     private void validateUsername(String username) {

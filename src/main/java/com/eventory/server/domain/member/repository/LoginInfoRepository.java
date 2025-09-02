@@ -12,4 +12,6 @@ public interface LoginInfoRepository extends JpaRepository<LoginInfo, Long> {
     
     @Query("SELECT l FROM LoginInfo l JOIN FETCH l.member WHERE l.username = :username")
     Optional<LoginInfo> findByUsernameWithUser(@Param("username") String username);
+    
+    Optional<LoginInfo> findByUsername(String username);
 }

@@ -1,11 +1,11 @@
-package com.seohaeng.backend.global.security.authProvider;
+package com.eventory.server.global.apipayload.exception.authProvider;
 
+import com.eventory.server.domain.member.dto.KakaoProfile;
+import com.eventory.server.domain.member.dto.OAuthToken;
+import com.eventory.server.global.apipayload.code.status.ErrorStatus;
+import com.eventory.server.global.apipayload.exception.handler.AuthException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seohaeng.backend.domain.user.dto.KakaoProfile;
-import com.seohaeng.backend.domain.user.dto.OAuthToken;
-import com.seohaeng.backend.global.apiPayload.code.status.ErrorStatus;
-import com.seohaeng.backend.global.apiPayload.exception.handler.AuthException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +23,10 @@ import org.springframework.web.client.RestTemplate;
 @Getter
 public class KakaoAuthProvider {
 
-    @Value("${KAKAO_CLIENT_ID}")
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String client;
 
-    @Value("${KAKAO_REDIRECT_URI}")
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String redirect;
 
     public OAuthToken requestToken(String code) {
