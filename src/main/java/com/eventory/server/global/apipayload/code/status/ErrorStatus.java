@@ -26,6 +26,10 @@ public enum ErrorStatus implements BaseErrorCode {
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "MEMBER4008", "이미 사용 중인 nickname입니다."),
     CURRENT_USERNAME(HttpStatus.BAD_REQUEST, "MEMBER4009", "현재 사용 중인 아이디입니다."),
     CURRENT_NICKNAME(HttpStatus.BAD_REQUEST, "MEMBER4010", "현재 사용 중인 닉네임입니다."),
+    INVALID_USERNAME_FORMAT(HttpStatus.BAD_REQUEST, "MEMBER4011", "아이디는 6-10자의 영문, 숫자 조합이어야 합니다."),
+    INVALID_NICKNAME_FORMAT(HttpStatus.BAD_REQUEST, "MEMBER4012", "닉네임은 2-12자의 한글, 영문, 숫자만 사용 가능합니다."),
+    INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "MEMBER4013", "올바른 이메일 형식이 아닙니다."),
+    INVALID_PHONE_FORMAT(HttpStatus.BAD_REQUEST, "MEMBER4014", "휴대폰 번호는 010-XXXX-XXXX 형식이어야 합니다."),
 
     // Auth 관련
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH4001", "유효하지 않은 토큰입니다."),

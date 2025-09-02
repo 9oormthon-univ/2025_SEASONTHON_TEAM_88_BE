@@ -1,6 +1,7 @@
 package com.eventory.server.domain.member.controller;
 
 import com.eventory.server.domain.member.dto.MemberRequestDTO;
+import com.eventory.server.domain.member.dto.MemberResponseDTO;
 import com.eventory.server.domain.member.service.MemberCommandService;
 import com.eventory.server.global.apipayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,5 +26,12 @@ public class MemberController {
     public ApiResponse<String> joinService (@Valid @RequestBody MemberRequestDTO.joinDTO request){
         memberCommandService.joinMember(request);
         return ApiResponse.onSuccess("회원가입이 완료되었습니다.");
+    }
+
+    @Operation(summary = "일반 로그인 API",
+            description = "아이디와 비밀번호를 정확히 입력하면 인증에 성공하며, Access Token이 발급됩니다.")
+    @PostMapping("/auth/login")
+    public ApiResponse<MemberResponseDTO.LoginResultDTO> localLogin (@RequestBody MemberRequestDTO.LoginDTO request){
+        return ApiResponse.onSuccess(memberCommandService.loginMember(request));
     }
 }

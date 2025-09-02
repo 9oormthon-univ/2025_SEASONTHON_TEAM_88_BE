@@ -1,4 +1,4 @@
-package com.eventory.server.domain.Party.entity.enums;
+package com.eventory.server.domain.party.entity.enums;
 
 public enum ParticipantType {
     FOR_ME,
