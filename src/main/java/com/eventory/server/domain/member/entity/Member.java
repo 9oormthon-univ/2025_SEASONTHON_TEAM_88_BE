@@ -24,8 +24,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String nickname;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "login_info_id")
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private LoginInfo loginInfo;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -33,4 +32,8 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Review> reviewList = new ArrayList<>();
+
+    public void updateLoginInfo(LoginInfo loginInfo) {
+        this.loginInfo = loginInfo;
+    }
 }

@@ -1,8 +1,8 @@
 package com.eventory.server.domain.party.entity;
 
-import com.eventory.server.domain.Party.entity.enums.ExpectedRange;
-import com.eventory.server.domain.Party.entity.enums.ParticipantType;
-import com.eventory.server.domain.Party.entity.enums.Purpose;
+import com.eventory.server.domain.party.entity.enums.ExpectedRange;
+import com.eventory.server.domain.party.entity.enums.ParticipantType;
+import com.eventory.server.domain.party.entity.enums.Purpose;
 import com.eventory.server.domain.common.BaseEntity;
 import com.eventory.server.domain.member.entity.Member;
 import jakarta.persistence.*;

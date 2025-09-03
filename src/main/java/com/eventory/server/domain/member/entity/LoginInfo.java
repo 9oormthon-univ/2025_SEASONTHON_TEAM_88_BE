@@ -31,7 +31,8 @@ public class LoginInfo {
     @Column(length = 255)
     private String email;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "loginInfo")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
     private Member member;
 
     public void encodePassword(String password) {
