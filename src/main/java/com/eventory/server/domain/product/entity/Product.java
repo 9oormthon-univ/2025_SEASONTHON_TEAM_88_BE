@@ -45,6 +45,9 @@ public class Product extends BaseEntity {
     @Column(name = "like_count")
     private Integer likeCount;
 
+    @Column(name = "review_rating")
+    private Double reviewRating;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
