@@ -17,7 +17,10 @@ public enum SuccessStatus implements BaseCode {
     USER_LOGIN_OK(HttpStatus.OK, "AUTH2001", "회원 로그인이 완료되었습니다."),
     USER_LOGOUT_OK(HttpStatus.OK, "AUTH2002", "회원 로그아웃이 완료되었습니다."),
     USER_DELETE_OK(HttpStatus.OK, "AUTH2003", "회원 탈퇴가 완료되었습니다."),
-    USER_REFRESH_OK(HttpStatus.OK, "AUTH2004", "토큰 재발급이 완료되었습니다.");
+    USER_REFRESH_OK(HttpStatus.OK, "AUTH2004", "토큰 재발급이 완료되었습니다."),
+
+    // 찜 기능 관련
+    LIKE_REGISTER_OK(HttpStatus.OK, "LIKE2001", "찜 등록 성공");
 
     private final HttpStatus httpStatus;
     private final String code;
