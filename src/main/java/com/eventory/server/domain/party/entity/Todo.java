@@ -30,4 +30,8 @@ public class Todo extends BaseEntity {
     @Builder.Default
     @Column(name = "is_completed")
     private boolean isCompleted = false;
+
+    public void updateStatus(Boolean isCompleted) {
+        this.isCompleted = isCompleted;
+    }
 }
