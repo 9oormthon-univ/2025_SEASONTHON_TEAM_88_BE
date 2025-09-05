@@ -36,11 +36,11 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build -x test
+          arguments: bootJar -x test
 
       - name: Rename build artifact to myapp.jar
         run: |
-          mv $(ls ./build/libs/*.jar | head -n 1) ./build/libs/myapp.jar
+          mv ./build/libs/*-boot.jar ./build/libs/myapp.jar
         shell: bash
 
       - name: Upload build artifact
