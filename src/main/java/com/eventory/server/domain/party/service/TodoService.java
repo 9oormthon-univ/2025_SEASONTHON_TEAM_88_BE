@@ -3,6 +3,7 @@ package com.eventory.server.domain.party.service;
 import com.eventory.server.domain.party.dto.request.CreateTodoRequest;
 import com.eventory.server.domain.party.dto.request.TodoCompleteRequest;
 import com.eventory.server.domain.party.dto.response.CreateTodoResponse;
+import com.eventory.server.domain.party.dto.response.DeleteTodoResponse;
 import com.eventory.server.domain.party.dto.response.TodoCompleteResponse;
 import com.eventory.server.domain.party.entity.Party;
 import com.eventory.server.domain.party.entity.Todo;
@@ -67,5 +68,20 @@ public class TodoService {
         todo.updateStatus(!completed);
 
         return new TodoCompleteResponse(todo.getId(), todo.isCompleted());
+    }
+
+    /**
+     * 투두 리스트 항목 삭제
+     * @param memberId
+     * @param todoId
+     * @return
+     */
+    @Transactional
+    public DeleteTodoResponse deleteTodo(Long memberId, Long todoId) {
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.TODO_NOT_FOUND));
+
+        todoRepository.delete(todo);
+        return new DeleteTodoResponse(todo.getId());
     }
 }

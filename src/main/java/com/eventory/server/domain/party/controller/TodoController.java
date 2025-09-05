@@ -3,6 +3,7 @@ package com.eventory.server.domain.party.controller;
 import com.eventory.server.domain.party.dto.request.CreateTodoRequest;
 import com.eventory.server.domain.party.dto.request.TodoCompleteRequest;
 import com.eventory.server.domain.party.dto.response.CreateTodoResponse;
+import com.eventory.server.domain.party.dto.response.DeleteTodoResponse;
 import com.eventory.server.domain.party.dto.response.TodoCompleteResponse;
 import com.eventory.server.domain.party.service.TodoService;
 import com.eventory.server.global.apipayload.ApiResponse;
@@ -38,5 +39,15 @@ public class TodoController {
     ) {
         TodoCompleteResponse todoCompleteResponse = todoService.updateTodoComplete(memberId, todoId, todoCompleteRequest);
         return ApiResponse.of(SuccessStatus.TODO_STATUS_UPDATE_OK, todoCompleteResponse);
+    }
+
+    @Operation(summary = "Todo 삭제 API")
+    @DeleteMapping("/{todoId}")
+    public ApiResponse<DeleteTodoResponse> deleteTodo(
+            @AuthUser Long memberId,
+            @PathVariable(name = "todoId") Long todoId
+    ) {
+        DeleteTodoResponse deleteTodoResponse = todoService.deleteTodo(memberId, todoId);
+        return ApiResponse.of(SuccessStatus.TODO_DELETE_OK, deleteTodoResponse);
     }
 }
