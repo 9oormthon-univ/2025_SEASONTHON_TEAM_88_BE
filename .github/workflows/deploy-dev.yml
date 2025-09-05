@@ -40,7 +40,7 @@ jobs:
 
       - name: Rename build artifact to myapp.jar
         run: |
-          mv ./build/libs/*-boot.jar ./build/libs/myapp.jar
+          mv $(ls -t build/libs/*.jar | head -n 1) ./build/libs/myapp.jar
         shell: bash
 
       - name: Upload build artifact
