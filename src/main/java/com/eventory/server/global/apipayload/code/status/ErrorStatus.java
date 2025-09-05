@@ -45,7 +45,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // Party 관련
     PARTY_NOT_FOUND(HttpStatus.NOT_FOUND, "PARTY4001", "존재하지 않는 파티입니다."),
-    FORBIDDEN_PARTY_DELETE(HttpStatus.FORBIDDEN, "PARTY4002", "본인의 파티만 삭제할 수 있습니다.")
+    FORBIDDEN_PARTY_DELETE(HttpStatus.FORBIDDEN, "PARTY4002", "본인의 파티만 삭제할 수 있습니다."),
+
+    // 투두 관련
+    FORBIDDEN_TODO_CREATE(HttpStatus.FORBIDDEN, "TODO4001", "본인의 파티에만 Todo 항목을 추가할 수 있습니다.")
     ;
 
     private final HttpStatus httpStatus;
