@@ -21,10 +21,12 @@ public enum SuccessStatus implements BaseCode {
 
     // 찜 기능 관련
     LIKE_REGISTER_OK(HttpStatus.OK, "LIKE2001", "찜 등록 성공"),
+    LIKE_CANCEL_OK(HttpStatus.OK, "LIKE2002", "찜 취소 성공"),
 
     // 파티 기능 관련
     PARTY_DELETE_OK(HttpStatus.OK, "PARTY2001", "성공적으로 파티가 삭제되었습니다."),
     PARTY_LIST_OK(HttpStatus.OK, "PARTY2002", "성공적으로 파티 리스트를 조회하였습니다."),
+    PARTY_CREATE_OK(HttpStatus.OK, "PARTY2003", "성공적으로 파티를 생성하였습니다."),
 
     // 투두 기능 관련
     TODO_CREATE_OK(HttpStatus.OK, "TODO2001", "성공적으로 Todo 항목이 추가되었습니다."),

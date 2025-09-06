@@ -1,5 +1,9 @@
 package com.eventory.server.domain.party.service;
 
+import com.eventory.server.domain.member.entity.Member;
+import com.eventory.server.domain.member.repository.MemberRepository;
+import com.eventory.server.domain.party.dto.request.CreatePartyRequest;
+import com.eventory.server.domain.party.dto.response.CreatePartyResponse;
 import com.eventory.server.domain.party.dto.response.DeletePartyResponse;
 import com.eventory.server.domain.party.dto.response.main.MyPartyResponse;
 import com.eventory.server.domain.party.dto.response.main.TodoResponse;
@@ -23,6 +27,7 @@ public class PartyService {
 
     private final PartyRepository partyRepository;
     private final TodoRepository todoRepository;
+    private final MemberRepository memberRepository;
     private final TodoService todoService;
 
     /**
@@ -87,5 +92,26 @@ public class PartyService {
         partyRepository.delete(party);
 
         return new DeletePartyResponse(party.getId());
+    }
+
+    /**
+     * 내 파티 생성
+     * @param memberId
+     * @param createPartyRequest
+     * @return CreatePartyResponse(partyId, partyName)
+     */
+    @Transactional
+    public CreatePartyResponse createParty(Long memberId, CreatePartyRequest createPartyRequest) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        String partyName = createPartyRequest.partyName();
+
+        Party party = Party.builder()
+                .name(partyName)
+                .member(member)
+                .build();
+
+        return new CreatePartyResponse(party.getId(), party.getName());
     }
 }

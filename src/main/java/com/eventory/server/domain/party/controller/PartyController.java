@@ -1,6 +1,8 @@
 package com.eventory.server.domain.party.controller;
 
 import com.eventory.server.domain.party.dto.PartyResponseDTO;
+import com.eventory.server.domain.party.dto.request.CreatePartyRequest;
+import com.eventory.server.domain.party.dto.response.CreatePartyResponse;
 import com.eventory.server.domain.party.dto.response.DeletePartyResponse;
 import com.eventory.server.domain.party.service.PartyQueryService;
 import com.eventory.server.domain.party.dto.response.main.MyPartyResponse;
@@ -47,5 +49,15 @@ public class PartyController {
             @AuthUser Long userId
     ) {
         return ApiResponse.onSuccess(partyQueryService.getSimilarItem(userId));
+    }
+
+    @Operation(summary = "내 파티 생성 API")
+    @PostMapping("/parties/new")
+    public ApiResponse<CreatePartyResponse> createParty(
+            @AuthUser Long memberId,
+            @RequestBody CreatePartyRequest createPartyRequest
+    ) {
+        CreatePartyResponse createPartyResponse = partyService.createParty(memberId, createPartyRequest);
+        return ApiResponse.of(SuccessStatus.PARTY_CREATE_OK, createPartyResponse);
     }
 }

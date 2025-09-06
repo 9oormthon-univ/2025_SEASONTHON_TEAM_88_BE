@@ -40,6 +40,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // Like 관련
     LIKE_ALREADY_EXISTS(HttpStatus.CONFLICT, "LIKE4001", "이미 찜을 누른 상품입니다."),
+    FORBIDDEN_LIKE_CANCEL(HttpStatus.FORBIDDEN, "LIKE4002", "본인의 찜만 취소할 수 있습니다."),
+    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "LIKE4003", "존재하지 않는 찜입니다."),
 
     // Product 관련
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCT4001", "존재하지 않는 상품입니다."),
