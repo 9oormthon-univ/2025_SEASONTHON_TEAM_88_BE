@@ -64,7 +64,6 @@ public class TodoService {
      */
     @Transactional
     public TodoCompleteResponse updateTodoComplete(Long memberId, Long todoId, TodoCompleteRequest todoCompleteRequest) {
-        // Todo memberId 추가
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.TODO_NOT_FOUND));
 
@@ -88,6 +87,10 @@ public class TodoService {
     public DeleteTodoResponse deleteTodo(Long memberId, Long todoId) {
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.TODO_NOT_FOUND));
+
+        if (!todo.getParty().getMember().getId().equals(memberId)) {
+            throw new GeneralException(ErrorStatus.FORBIDDEN_TODO_DELETE);
+        }
 
         todoRepository.delete(todo);
         return new DeleteTodoResponse(todo.getId());
