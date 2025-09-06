@@ -5,6 +5,7 @@ import com.eventory.server.domain.member.repository.MemberRepository;
 import com.eventory.server.domain.party.dto.request.CreatePartyRequest;
 import com.eventory.server.domain.party.dto.response.CreatePartyResponse;
 import com.eventory.server.domain.party.dto.response.DeletePartyResponse;
+import com.eventory.server.domain.party.dto.response.SelectPartyListResponse;
 import com.eventory.server.domain.party.dto.response.main.MyPartyResponse;
 import com.eventory.server.domain.party.dto.response.main.TodoResponse;
 import com.eventory.server.domain.party.entity.Party;
@@ -113,5 +114,20 @@ public class PartyService {
                 .build();
 
         return new CreatePartyResponse(party.getId(), party.getName());
+    }
+
+    public List<SelectPartyListResponse> selectPartyList(Long memberId) {
+        List<Party> parties = partyRepository.findByMemberId(memberId);
+
+        List<SelectPartyListResponse> selectPartyListResponses = new ArrayList<>();
+        SelectPartyListResponse selectPartyListResponse;
+        for (Party party : parties) {
+            Long partyId = party.getId();
+            String partyName = party.getName();
+            selectPartyListResponse = new SelectPartyListResponse(partyId, partyName);
+            selectPartyListResponses.add(selectPartyListResponse);
+        }
+
+        return selectPartyListResponses;
     }
 }
