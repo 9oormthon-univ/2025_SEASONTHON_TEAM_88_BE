@@ -42,6 +42,12 @@ public class PartyQueryService {
     @Value("${gemini.api.key}")
     private String geminiApiKey;
 
+    @Value("${gemini.prompts.similarItemPrompt}")
+    private String getSimilarItemPrompt;
+
+    @Value("${gemini.prompts.similarItemPrompt}")
+    private String createPackagePrompt;
+
     private final ProductRepository productRepository;
     private final LikeRepository likeRepository;
 
@@ -69,12 +75,7 @@ public class PartyQueryService {
         String geminiURL = geminiApiUrl + "?key=" + geminiApiKey;
         String preparationContent = String.join(", ", productNameList);
 
-        String prompt =
-                "너는 상품명으로부터 연관 키워드를 추출하는 JSON 생성기다.\n" +
-                        "아래의 상품명들을 보고 비슷한 상품을 조회할 수 있는 핵심 키워드를 최대 5개까지 추출하라.\n" +
-                        "출력은 오직 JSON만 반환해야 하며, 설명이나 다른 문장은 추가하지 마라.\n\n" +
-                        "형식: {\"keywords\": [\"키워드1\", \"키워드2\", \"키워드3\"]}\n\n" +
-                        "상품명: " + preparationContent;
+        String prompt = getSimilarItemPrompt + preparationContent;
 
         GeminiRequestDTO requestDto = GeminiRequestDTO.builder()
                 .contents(List.of(
@@ -160,9 +161,7 @@ public class PartyQueryService {
 
         String geminiURL = geminiApiUrl + "?key=" + geminiApiKey;
 
-        String prompt = "다음 텍스트에서 상품 검색에 사용할 키워드들을 추출해서 JSON 형태로 반환해주세요.\n\n" +
-                "형식: {\"keywords\": [\"키워드1\", \"키워드2\", \"키워드3\"]}\n\n" +
-                "텍스트: " + preparationContent;
+        String prompt = createPackagePrompt + preparationContent;
 
         GeminiRequestDTO requestDto = GeminiRequestDTO.builder()
                 .contents(List.of(

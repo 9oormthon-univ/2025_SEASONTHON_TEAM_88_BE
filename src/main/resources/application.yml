@@ -47,4 +47,5 @@ gemini:
     url: ${GEMINI_API_URL}
     key: ${GOOGLE_API_KEY}
   prompts:
-    news-summary: ${GEMINI_NEWS_SUMMARY_PROMPT}
+    similarItemPrompt: ${GEMINI_SIMILAR_ITEM_PROMPT}
+    createPackagePrompt: ${GEMINI_CREATE_PACKAGE_PROMPT}
