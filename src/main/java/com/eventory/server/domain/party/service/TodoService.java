@@ -68,6 +68,10 @@ public class TodoService {
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.TODO_NOT_FOUND));
 
+        if (!todo.getParty().getMember().getId().equals(memberId)) {
+            throw new GeneralException(ErrorStatus.FORBIDDEN_TODO_STATUS_UPDATE);
+        }
+
         Boolean completed = todoCompleteRequest.isCompleted();
         todo.updateStatus(!completed);
 
