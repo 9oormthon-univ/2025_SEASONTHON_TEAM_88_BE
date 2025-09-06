@@ -3,6 +3,7 @@ package com.eventory.server.domain.party.controller;
 import com.eventory.server.domain.party.dto.PartyResponseDTO;
 import com.eventory.server.domain.party.dto.response.DeletePartyResponse;
 import com.eventory.server.domain.party.service.PartyQueryService;
+import com.eventory.server.domain.party.dto.response.main.MyPartyResponse;
 import com.eventory.server.domain.party.service.PartyService;
 import com.eventory.server.global.apipayload.ApiResponse;
 import com.eventory.server.global.apipayload.code.status.SuccessStatus;
@@ -21,7 +22,16 @@ public class PartyController {
     private final PartyService partyService;
     private final PartyQueryService partyQueryService;
 
-    @Operation(summary = "파티 삭제 API")
+    @Operation(summary = "내 파티 리스트 API")
+    @GetMapping("/my")
+    public ApiResponse<MyPartyResponse> myPartyList(
+            @AuthUser Long memberId
+    ) {
+        MyPartyResponse myPartyResponse = partyService.partyMain(memberId);
+        return ApiResponse.of(SuccessStatus.PARTY_LIST_OK, myPartyResponse);
+    }
+
+    @Operation(summary = "내 파티 삭제 API")
     @DeleteMapping("/{partyId}")
     public ApiResponse<DeletePartyResponse> deleteParty(
             @AuthUser Long userId,
