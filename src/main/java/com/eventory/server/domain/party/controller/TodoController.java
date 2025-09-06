@@ -23,10 +23,10 @@ public class TodoController {
     @Operation(summary = "Todo 생성 API")
     @PostMapping
     public ApiResponse<CreateTodoResponse> createTodo(
-            @AuthUser Long userId,
+            @AuthUser Long memberId,
             @RequestBody CreateTodoRequest createTodoRequest
     ) {
-        CreateTodoResponse createTodoResponse = todoService.createTodo(userId, createTodoRequest);
+        CreateTodoResponse createTodoResponse = todoService.createTodo(memberId, createTodoRequest);
         return ApiResponse.of(SuccessStatus.TODO_CREATE_OK, createTodoResponse);
     }
 
