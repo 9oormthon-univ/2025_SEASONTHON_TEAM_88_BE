@@ -55,7 +55,7 @@ public class PartyController {
     }
 
     @Operation(summary = "내 파티 생성 API")
-    @PostMapping("/parties/new")
+    @PostMapping("/new")
     public ApiResponse<CreatePartyResponse> createParty(
             @AuthUser Long memberId,
             @RequestBody CreatePartyRequest createPartyRequest
