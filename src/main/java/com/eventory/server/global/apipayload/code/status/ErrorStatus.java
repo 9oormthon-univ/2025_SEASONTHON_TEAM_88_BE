@@ -42,7 +42,15 @@ public enum ErrorStatus implements BaseErrorCode {
     LIKE_ALREADY_EXISTS(HttpStatus.CONFLICT, "LIKE4001", "이미 찜을 누른 상품입니다."),
 
     // Product 관련
-    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCT4001", "존재하지 않는 상품입니다.")
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCT4001", "존재하지 않는 상품입니다."),
+
+    // Party 관련
+    PARTY_NOT_FOUND(HttpStatus.NOT_FOUND, "PARTY4001", "존재하지 않는 파티입니다."),
+    FORBIDDEN_PARTY_DELETE(HttpStatus.FORBIDDEN, "PARTY4002", "본인의 파티만 삭제할 수 있습니다."),
+
+    // 투두 관련
+    FORBIDDEN_TODO_CREATE(HttpStatus.FORBIDDEN, "TODO4001", "본인의 파티에만 Todo 항목을 추가할 수 있습니다."),
+    TODO_NOT_FOUND(HttpStatus.NOT_FOUND, "TODO4002", "존재하지 않는 Todo입니다."),
     ;
 
     private final HttpStatus httpStatus;
