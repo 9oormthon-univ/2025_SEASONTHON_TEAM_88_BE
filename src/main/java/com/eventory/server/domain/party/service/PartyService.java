@@ -24,6 +24,11 @@ public class PartyService {
     private final PartyRepository partyRepository;
     private final TodoRepository todoRepository;
 
+    /**
+     * 내 파티 리스트 조회
+     * @param memberId
+     * @return MyPartyResponse (partyId, partyName, progressRate, todoResponses)
+     */
     public MyPartyResponse partyMain(Long memberId) {
         // Todo progressRate 기능 구현
         List<Party> myParties = partyRepository.findByMemberId(memberId);
