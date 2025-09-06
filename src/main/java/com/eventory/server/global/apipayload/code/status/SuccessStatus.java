@@ -24,6 +24,7 @@ public enum SuccessStatus implements BaseCode {
 
     // 파티 기능 관련
     PARTY_DELETE_OK(HttpStatus.OK, "PARTY2001", "성공적으로 파티가 삭제되었습니다."),
+    PARTY_LIST_OK(HttpStatus.OK, "PARTY2002", "성공적으로 파티 리스트를 조회하였습니다."),
 
     // 투두 기능 관련
     TODO_CREATE_OK(HttpStatus.OK, "TODO2001", "성공적으로 Todo 항목이 추가되었습니다."),
