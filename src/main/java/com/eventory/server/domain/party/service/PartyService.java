@@ -39,6 +39,7 @@ public class PartyService {
 
     /**
      * 내 파티 리스트 조회
+     *
      * @param memberId
      * @return MyPartyResponse (partyId, partyName, progressRate, todoResponses)
      */
@@ -67,7 +68,7 @@ public class PartyService {
                     productId = todo.getProduct().getId();
                     productName = todo.getProduct().getProductName();
                     todoResponse = new TodoResponse(todoId, todoType, productId, productName, task, isCompleted);
-                } else if (todo.getTask() != null){
+                } else if (todo.getTask() != null) {
                     todoType = TodoType.CUSTOM;
                     task = todo.getTask();
                     todoResponse = new TodoResponse(todoId, todoType, productId, productName, task, isCompleted);
@@ -83,6 +84,7 @@ public class PartyService {
 
     /**
      * 내 파티 삭제
+     *
      * @param memberId
      * @param partyId
      * @return DeletePartyResponse (partyId)
@@ -103,6 +105,7 @@ public class PartyService {
 
     /**
      * 내 파티 생성
+     *
      * @param memberId
      * @param createPartyRequest
      * @return CreatePartyResponse(partyId, partyName)
@@ -142,6 +145,7 @@ public class PartyService {
         }
 
         return new SelectPartyResponse(partyId);
+    }
 
     public List<SelectPartyListResponse> selectPartyList(Long memberId) {
         List<Party> parties = partyRepository.findByMemberId(memberId);
@@ -156,5 +160,27 @@ public class PartyService {
         }
 
         return selectPartyListResponses;
+    }
+
+    public SelectPartyResponse selectPartyMe(Long memberId, Long partyId, List<SelectPartyRequest> selectPartyRequests) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Party party = partyRepository.findById(partyId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.PARTY_NOT_FOUND));
+
+        for (SelectPartyRequest selectPartyRequest : selectPartyRequests) {
+            Long productId = selectPartyRequest.productId();
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.PRODUCT_NOT_FOUND));
+            Todo todo = Todo.builder()
+                    .party(party)
+                    .product(product)
+                    .build();
+
+            todoRepository.save(todo);
+        }
+
+        return new SelectPartyResponse(partyId);
     }
 }

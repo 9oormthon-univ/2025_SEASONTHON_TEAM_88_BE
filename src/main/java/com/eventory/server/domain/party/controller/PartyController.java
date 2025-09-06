@@ -70,8 +70,9 @@ public class PartyController {
             @PathVariable(name = "partyId") Long partyId,
             @RequestBody List<SelectPartyRequest> selectPartyRequests
     ) {
-        SelectPartyResponse selectPartyResponse = partyService.selectParty(memberId, partyId, selectPartyRequests);
+        SelectPartyResponse selectPartyResponse = partyService.selectPartyMe(memberId, partyId, selectPartyRequests);
         return ApiResponse.of(SuccessStatus.TODO_CREATE_OK, selectPartyResponse);
+    }
 
     @GetMapping("/select")
     public ApiResponse<List<SelectPartyListResponse>> selectPartyList(
