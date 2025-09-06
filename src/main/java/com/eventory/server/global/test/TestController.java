@@ -14,9 +14,4 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Test")
 public class TestController {
 
-    @Operation(summary = "Test API")
-    @GetMapping("/test")
-    public ApiResponse<String> getResponse() {
-        return ApiResponse.onSuccess("응답 통일 예시");
-    }
 }

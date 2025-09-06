@@ -37,4 +37,10 @@ public class MemberController {
     public ApiResponse<MemberResponseDTO.LoginResultDTO> kakaoLogin(@RequestParam("code") String code) {
         return ApiResponse.onSuccess(memberCommandService.kakaoLogin(code));
     }
+
+    @Operation(summary = "Test API")
+    @GetMapping("/auth/test")
+    public ApiResponse<String> getResponse() {
+        return ApiResponse.onSuccess("응답 통일 예시");
+    }
 }

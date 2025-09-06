@@ -1,5 +1,7 @@
 package com.eventory.server.domain.product.entity;
 
+import com.eventory.server.domain.party.entity.enums.ParticipantType;
+import com.eventory.server.domain.party.entity.enums.Purpose;
 import com.eventory.server.domain.product.entity.enums.Category;
 import com.eventory.server.domain.product.entity.enums.Delivery;
 import com.eventory.server.domain.review.entity.Review;
@@ -31,6 +33,12 @@ public class Product extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
     private Category category;
+
+    @Enumerated(EnumType.STRING)
+    private Purpose purpose;
+
+    @Enumerated(EnumType.STRING)
+    private ParticipantType participantType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "delivery_type")
