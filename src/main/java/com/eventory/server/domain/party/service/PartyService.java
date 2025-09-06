@@ -23,6 +23,7 @@ public class PartyService {
 
     private final PartyRepository partyRepository;
     private final TodoRepository todoRepository;
+    private final TodoService todoService;
 
     /**
      * 내 파티 리스트 조회
@@ -30,7 +31,6 @@ public class PartyService {
      * @return MyPartyResponse (partyId, partyName, progressRate, todoResponses)
      */
     public MyPartyResponse partyMain(Long memberId) {
-        // Todo progressRate 기능 구현
         List<Party> myParties = partyRepository.findByMemberId(memberId);
         if (myParties.isEmpty()) {
             return null;
@@ -40,7 +40,7 @@ public class PartyService {
         for (Party myParty : myParties) {
             Long partyId = myParty.getId();
             String partyName = myParty.getName();
-            Double progressRate = 0D;
+            Double progressRate = todoService.calculateReviewRating(partyId);
             List<Todo> todos = todoRepository.findByPartyId(partyId);
             List<TodoResponse> todoResponses = new ArrayList<>();
             TodoResponse todoResponse;
@@ -71,16 +71,16 @@ public class PartyService {
 
     /**
      * 내 파티 삭제
-     * @param userId
+     * @param memberId
      * @param partyId
      * @return DeletePartyResponse (partyId)
      */
     @Transactional
-    public DeletePartyResponse deleteParty(Long userId, Long partyId) {
+    public DeletePartyResponse deleteParty(Long memberId, Long partyId) {
         Party party = partyRepository.findById(partyId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.PARTY_NOT_FOUND));
 
-        if (!party.getMember().getId().equals(userId)) {
+        if (!party.getMember().getId().equals(memberId)) {
             throw new GeneralException(ErrorStatus.FORBIDDEN_PARTY_DELETE);
         }
 
