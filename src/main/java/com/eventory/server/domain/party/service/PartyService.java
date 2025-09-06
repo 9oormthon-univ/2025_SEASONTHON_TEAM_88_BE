@@ -122,6 +122,8 @@ public class PartyService {
                 .member(member)
                 .build();
 
+        partyRepository.save(party);
+
         return new CreatePartyResponse(party.getId(), party.getName());
     }
 
