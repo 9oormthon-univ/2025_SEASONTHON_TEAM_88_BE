@@ -3,8 +3,10 @@ package com.eventory.server.domain.party.service;
 import com.eventory.server.domain.member.entity.Member;
 import com.eventory.server.domain.member.repository.MemberRepository;
 import com.eventory.server.domain.party.dto.request.CreatePartyRequest;
+import com.eventory.server.domain.party.dto.request.SelectPartyRequest;
 import com.eventory.server.domain.party.dto.response.CreatePartyResponse;
 import com.eventory.server.domain.party.dto.response.DeletePartyResponse;
+import com.eventory.server.domain.party.dto.response.SelectPartyResponse;
 import com.eventory.server.domain.party.dto.response.main.MyPartyResponse;
 import com.eventory.server.domain.party.dto.response.main.TodoResponse;
 import com.eventory.server.domain.party.entity.Party;
@@ -12,9 +14,12 @@ import com.eventory.server.domain.party.entity.Todo;
 import com.eventory.server.domain.party.entity.enums.TodoType;
 import com.eventory.server.domain.party.repository.PartyRepository;
 import com.eventory.server.domain.party.repository.TodoRepository;
+import com.eventory.server.domain.product.entity.Product;
+import com.eventory.server.domain.product.repository.ProductRepository;
 import com.eventory.server.global.apipayload.code.status.ErrorStatus;
 import com.eventory.server.global.apipayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.error.Error;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +33,7 @@ public class PartyService {
     private final PartyRepository partyRepository;
     private final TodoRepository todoRepository;
     private final MemberRepository memberRepository;
+    private final ProductRepository productRepository;
     private final TodoService todoService;
 
     /**
@@ -113,5 +119,27 @@ public class PartyService {
                 .build();
 
         return new CreatePartyResponse(party.getId(), party.getName());
+    }
+
+    public SelectPartyResponse selectParty(Long memberId, Long partyId, List<SelectPartyRequest> selectPartyRequests) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+
+        Party party = partyRepository.findById(partyId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.PARTY_NOT_FOUND));
+
+        for (SelectPartyRequest selectPartyRequest : selectPartyRequests) {
+            Long productId = selectPartyRequest.productId();
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.PRODUCT_NOT_FOUND));
+            Todo todo = Todo.builder()
+                    .party(party)
+                    .product(product)
+                    .build();
+
+            todoRepository.save(todo);
+        }
+
+        return new SelectPartyResponse(partyId);
     }
 }
