@@ -34,10 +34,10 @@ public class PartyController {
     @Operation(summary = "내 파티 삭제 API")
     @DeleteMapping("/{partyId}")
     public ApiResponse<DeletePartyResponse> deleteParty(
-            @AuthUser Long userId,
+            @AuthUser Long memberId,
             @PathVariable(name = "partyId") Long partyId
     ) {
-        DeletePartyResponse deletePartyResponse = partyService.deleteParty(userId, partyId);
+        DeletePartyResponse deletePartyResponse = partyService.deleteParty(memberId, partyId);
         return ApiResponse.of(SuccessStatus.PARTY_DELETE_OK, deletePartyResponse);
     }
 
