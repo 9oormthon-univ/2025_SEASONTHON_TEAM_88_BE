@@ -2,8 +2,10 @@ package com.eventory.server.domain.party.controller;
 
 import com.eventory.server.domain.party.dto.PartyResponseDTO;
 import com.eventory.server.domain.party.dto.request.CreatePartyRequest;
+import com.eventory.server.domain.party.dto.request.SelectPartyRequest;
 import com.eventory.server.domain.party.dto.response.CreatePartyResponse;
 import com.eventory.server.domain.party.dto.response.DeletePartyResponse;
+import com.eventory.server.domain.party.dto.response.SelectPartyResponse;
 import com.eventory.server.domain.party.dto.response.SelectPartyListResponse;
 import com.eventory.server.domain.party.service.PartyQueryService;
 import com.eventory.server.domain.party.dto.response.main.MyPartyResponse;
@@ -61,6 +63,15 @@ public class PartyController {
         CreatePartyResponse createPartyResponse = partyService.createParty(memberId, createPartyRequest);
         return ApiResponse.of(SuccessStatus.PARTY_CREATE_OK, createPartyResponse);
     }
+
+    @PostMapping("/select/{partyId}")
+    public ApiResponse<SelectPartyResponse> selectParty(
+            @AuthUser Long memberId,
+            @PathVariable(name = "partyId") Long partyId,
+            @RequestBody List<SelectPartyRequest> selectPartyRequests
+    ) {
+        SelectPartyResponse selectPartyResponse = partyService.selectParty(memberId, partyId, selectPartyRequests);
+        return ApiResponse.of(SuccessStatus.TODO_CREATE_OK, selectPartyResponse);
 
     @GetMapping("/select")
     public ApiResponse<List<SelectPartyListResponse>> selectPartyList(
