@@ -41,3 +41,10 @@ jwt:
     expiration:
       access: ${JWT_ACCESS_TOKEN_TIME}
       refresh: ${JWT_REFRESH_TOKEN_TIME}
+
+gemini:
+  api:
+    url: ${GEMINI_API_URL}
+    key: ${GOOGLE_API_KEY}
+  prompts:
+    news-summary: ${GEMINI_NEWS_SUMMARY_PROMPT}
