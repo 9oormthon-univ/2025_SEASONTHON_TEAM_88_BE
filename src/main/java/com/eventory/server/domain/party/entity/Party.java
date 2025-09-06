@@ -1,8 +1,5 @@
 package com.eventory.server.domain.party.entity;
 
-import com.eventory.server.domain.party.entity.enums.ExpectedRange;
-import com.eventory.server.domain.party.entity.enums.ParticipantType;
-import com.eventory.server.domain.party.entity.enums.Purpose;
 import com.eventory.server.domain.common.BaseEntity;
 import com.eventory.server.domain.member.entity.Member;
 import jakarta.persistence.*;
@@ -10,7 +7,6 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Entity
 @Builder
@@ -27,22 +23,7 @@ public class Party extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Purpose purpose;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ExpectedRange expectedRange;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ParticipantType participantType;
-
-    private String specialNotes;
-
-    @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PartyShoppingItem> partyShoppingItemList = new ArrayList<>();
+    private String name;
 
     @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Todo> todoList = new ArrayList<>();

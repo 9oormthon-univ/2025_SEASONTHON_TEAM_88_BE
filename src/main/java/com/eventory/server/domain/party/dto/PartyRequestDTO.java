@@ -18,4 +18,10 @@ public class PartyRequestDTO {
         private String preparationContent;
         private List<Category> wishListItems;
     }
+
+    @Getter
+    public static class createPartyRequest {
+        private String packageName;
+        private List<Long> wishListItems;
+    }
 }

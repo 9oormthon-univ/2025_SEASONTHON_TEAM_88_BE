@@ -33,6 +33,7 @@ public class PartyResponseDTO {
     @AllArgsConstructor
     public static class ProductInfo {
         private String productImage;
+        private Long productId;
         private String productName;
         private Category category;
         private int price;
