@@ -40,11 +40,8 @@ public class PartyCommandService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
 
-    // 내 파티 생성
-    public PartyResponseDTO.CustomPackageResponse createParty(Long memberId, PartyRequestDTO.PartySurveyRequest request){
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
+    // 설문 기반 맞춤 패키지 생성
+    public PartyResponseDTO.CustomPackageResponse createParty(PartyRequestDTO.PartySurveyRequest request){
 
         List<Product> filteredProducts = productRepository.findByPurposeAndParticipantTypeAndCategoryIn(
                 request.getPartyPurpose(),
@@ -55,16 +52,6 @@ public class PartyCommandService {
         if (request.getPreparationContent() != null && !request.getPreparationContent().trim().isEmpty()) {
             filteredProducts = toGemini(filteredProducts, request.getPreparationContent());
         }
-
-        Party party = Party.builder()
-                .member(member)
-                .purpose(request.getPartyPurpose())
-                .expectedRange(request.getBudgetRange())
-                .participantType(request.getCompanionType())
-                .specialNotes(request.getPreparationContent())
-                .build();
-        
-        Party savedParty = partyRepository.save(party);
 
         List<PartyResponseDTO.BudgetPackage> budgetPackages = createBudgetPackages(filteredProducts, request.getBudgetRange());
 
