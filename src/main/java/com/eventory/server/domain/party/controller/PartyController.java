@@ -17,6 +17,7 @@ public class PartyController {
 
     private final PartyService partyService;
 
+    @Operation(summary = "내 파티 리스트 API")
     @GetMapping("/my")
     public ApiResponse<MyPartyResponse> myPartyList(
             @AuthUser Long memberId
@@ -25,7 +26,7 @@ public class PartyController {
         return ApiResponse.of(SuccessStatus.PARTY_LIST_OK, myPartyResponse);
     }
 
-    @Operation(summary = "파티 삭제 API")
+    @Operation(summary = "내 파티 삭제 API")
     @DeleteMapping("/{partyId}")
     public ApiResponse<DeletePartyResponse> deleteParty(
             @AuthUser Long userId,
