@@ -67,7 +67,7 @@ public class TodoService {
         Boolean completed = todoCompleteRequest.isCompleted();
         todo.updateStatus(!completed);
 
-        return new TodoCompleteResponse(todo.getId(), todo.isCompleted());
+        return new TodoCompleteResponse(todo.getId(), todo.getIsCompleted());
     }
 
     /**
