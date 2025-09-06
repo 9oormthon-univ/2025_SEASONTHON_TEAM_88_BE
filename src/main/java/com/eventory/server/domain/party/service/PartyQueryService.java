@@ -2,12 +2,17 @@ package com.eventory.server.domain.party.service;
 
 import com.eventory.server.domain.common.dto.GeminiRequestDTO;
 import com.eventory.server.domain.common.dto.GeminiResponseDTO;
+import com.eventory.server.domain.like.entity.Like;
+import com.eventory.server.domain.like.repository.LikeRepository;
+import com.eventory.server.domain.member.entity.Member;
+import com.eventory.server.domain.member.repository.MemberRepository;
 import com.eventory.server.domain.party.dto.PartyRequestDTO;
 import com.eventory.server.domain.party.dto.PartyResponseDTO;
 import com.eventory.server.domain.party.entity.enums.ExpectedRange;
 import com.eventory.server.domain.product.entity.Product;
 import com.eventory.server.domain.product.repository.ProductRepository;
 import com.eventory.server.global.apipayload.code.status.ErrorStatus;
+import com.eventory.server.global.apipayload.exception.handler.MemberHandler;
 import com.eventory.server.global.apipayload.exception.handler.PartyHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,15 +23,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.eventory.server.domain.party.convter.PartyConverter.toProductInfo;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PartyQueryService {
 
+    private final MemberRepository memberRepository;
     @Value("${gemini.api.url}")
     private String geminiApiUrl;
 
@@ -34,53 +43,116 @@ public class PartyQueryService {
     private String geminiApiKey;
 
     private final ProductRepository productRepository;
+    private final LikeRepository likeRepository;
 
-    // 설문 기반 맞춤 패키지 생성
-    public PartyResponseDTO.CustomPackageResponse createParty(PartyRequestDTO.PartySurveyRequest request){
+    public List<PartyResponseDTO.ProductInfo> getSimilarItem(Long memberId){
 
-        List<Product> filteredProducts = productRepository.findByPurposeAndParticipantTypeAndCategoryIn(
-                request.getPartyPurpose(),
-                request.getCompanionType(),
-                request.getWishListItems()
-        );
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberHandler(ErrorStatus.MEMBER_NOT_FOUND));
 
-        if (request.getPreparationContent() != null && !request.getPreparationContent().trim().isEmpty()) {
-            filteredProducts = toGemini(filteredProducts, request.getPreparationContent());
-        }
+        List<String> productNameList = likeRepository.findByMemberWithProduct(member).stream()
+                .map(Like::getProduct)
+                .map(Product::getProductName)
+                .collect(Collectors.toList());
 
-        List<PartyResponseDTO.BudgetPackage> budgetPackages = createBudgetPackages(filteredProducts, request.getBudgetRange());
+        List<Product> similarProductList = getProductsSimilarToLiked(productNameList);
 
-        return PartyResponseDTO.CustomPackageResponse.builder()
-                .customPackage(budgetPackages)
-                .build();
+        return similarProductList.stream()
+                .sorted(Comparator.comparing(Product::getPrice))
+                .limit(5)
+                .map(product -> toProductInfo(product))
+                .collect(Collectors.toList());
     }
 
-    // AI 키워드 기반 상품 필터링
-    private List<Product> toGemini(List<Product> products, String preparationContent) {
-        if (preparationContent == null || preparationContent.trim().isEmpty()) {
-            return products;
-        }
+    private List<Product> getProductsSimilarToLiked(List<String> productNameList) {
 
-        List<String> keywords = extractKeywordsFromGemini(preparationContent);
-        if (keywords.isEmpty()) {
-            return products;
-        }
+        String geminiURL = geminiApiUrl + "?key=" + geminiApiKey;
+        String preparationContent = String.join(", ", productNameList);
 
-        List<Product> keywordProducts = new ArrayList<>();
-        for (String keyword : keywords) {
-            List<Product> foundProducts = productRepository.findByProductNameContaining(keyword);
-            keywordProducts.addAll(foundProducts);
-        }
+        String prompt =
+                "너는 상품명으로부터 연관 키워드를 추출하는 JSON 생성기다.\n" +
+                        "아래의 상품명들을 보고 비슷한 상품을 조회할 수 있는 핵심 키워드를 최대 5개까지 추출하라.\n" +
+                        "출력은 오직 JSON만 반환해야 하며, 설명이나 다른 문장은 추가하지 마라.\n\n" +
+                        "형식: {\"keywords\": [\"키워드1\", \"키워드2\", \"키워드3\"]}\n\n" +
+                        "상품명: " + preparationContent;
 
-        Set<Long> productIds = products.stream().map(Product::getId).collect(Collectors.toSet());
-        for (Product keywordProduct : keywordProducts) {
-            if (!productIds.contains(keywordProduct.getId())) {
-                products.add(keywordProduct);
-                productIds.add(keywordProduct.getId());
+        GeminiRequestDTO requestDto = GeminiRequestDTO.builder()
+                .contents(List.of(
+                        GeminiRequestDTO.Content.builder()
+                                .parts(List.of(
+                                        GeminiRequestDTO.Part.builder()
+                                                .text(prompt)
+                                                .build()
+                                ))
+                                .build()
+                ))
+                .build();
+
+        WebClient webClient = WebClient.builder().build();
+
+        try {
+            GeminiResponseDTO response = webClient.post()
+                    .uri(geminiURL)
+                    .header("Content-Type", "application/json")
+                    .bodyValue(requestDto)
+                    .retrieve()
+                    .bodyToMono(GeminiResponseDTO.class)
+                    .block();
+
+            String jsonResponse = response.getCandidates().get(0).getContent().getParts().get(0).getText();
+
+            try {
+                String cleanJsonResponse = jsonResponse;
+                if (jsonResponse.contains("```")) {
+                    cleanJsonResponse = jsonResponse
+                            .replaceAll("```json\\s*", "")
+                            .replaceAll("```\\s*", "")
+                            .trim();
+                }
+
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode node = mapper.readTree(cleanJsonResponse);
+                JsonNode keywordsArray = node.get("keywords");
+
+                List<String> keywords = new ArrayList<>();
+                if (keywordsArray != null && keywordsArray.isArray()) {
+                    for (JsonNode keyword : keywordsArray) {
+                        keywords.add(keyword.asText());
+                    }
+                }
+
+                List<Product> products = new ArrayList<>();
+                for (String keyword : keywords) {
+                    List<Product> found = productRepository.findByProductNameContaining(keyword);
+                    products.addAll(found);
+                }
+
+                return products.stream()
+                        .distinct()
+                        .collect(Collectors.toList());
+
+            } catch (Exception jsonException) {
+                String[] words = preparationContent.split("[,\\s]+");
+                List<String> fallbackKeywords = new ArrayList<>();
+                for (String word : words) {
+                    if (word.length() >= 2) {
+                        fallbackKeywords.add(word.trim());
+                    }
+                }
+
+                List<Product> products = new ArrayList<>();
+                for (String keyword : fallbackKeywords) {
+                    List<Product> found = productRepository.findByProductNameContaining(keyword);
+                    products.addAll(found);
+                }
+                return products.stream()
+                        .distinct()
+                        .collect(Collectors.toList());
             }
-        }
 
-        return products;
+        } catch (Exception e) {
+            throw new PartyHandler(ErrorStatus.GEMINI_NOT_WORK);
+        }
     }
 
     // AI 키워드 추출
@@ -140,6 +212,54 @@ public class PartyQueryService {
         } catch (Exception e) {
             throw new PartyHandler(ErrorStatus.GEMINI_NOT_WORK);
         }
+    }
+
+    // 설문 기반 맞춤 패키지 생성
+    public PartyResponseDTO.CustomPackageResponse createParty(PartyRequestDTO.PartySurveyRequest request){
+
+        List<Product> filteredProducts = productRepository.findByPurposeAndParticipantTypeAndCategoryIn(
+                request.getPartyPurpose(),
+                request.getCompanionType(),
+                request.getWishListItems()
+        );
+
+        if (request.getPreparationContent() != null && !request.getPreparationContent().trim().isEmpty()) {
+            filteredProducts = toGemini(filteredProducts, request.getPreparationContent());
+        }
+
+        List<PartyResponseDTO.BudgetPackage> budgetPackages = createBudgetPackages(filteredProducts, request.getBudgetRange());
+
+        return PartyResponseDTO.CustomPackageResponse.builder()
+                .customPackage(budgetPackages)
+                .build();
+    }
+
+    // AI 키워드 기반 상품 필터링
+    private List<Product> toGemini(List<Product> products, String preparationContent) {
+        if (preparationContent == null || preparationContent.trim().isEmpty()) {
+            return products;
+        }
+
+        List<String> keywords = extractKeywordsFromGemini(preparationContent);
+        if (keywords.isEmpty()) {
+            return products;
+        }
+
+        List<Product> keywordProducts = new ArrayList<>();
+        for (String keyword : keywords) {
+            List<Product> foundProducts = productRepository.findByProductNameContaining(keyword);
+            keywordProducts.addAll(foundProducts);
+        }
+
+        Set<Long> productIds = products.stream().map(Product::getId).collect(Collectors.toSet());
+        for (Product keywordProduct : keywordProducts) {
+            if (!productIds.contains(keywordProduct.getId())) {
+                products.add(keywordProduct);
+                productIds.add(keywordProduct.getId());
+            }
+        }
+
+        return products;
     }
 
     // simple 키워드 추출
