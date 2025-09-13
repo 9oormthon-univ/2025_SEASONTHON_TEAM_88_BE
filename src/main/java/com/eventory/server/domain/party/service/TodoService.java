@@ -71,7 +71,6 @@ public class TodoService {
             throw new GeneralException(ErrorStatus.FORBIDDEN_TODO_STATUS_UPDATE);
         }
 
-        Boolean completed = todoCompleteRequest.isCompleted();
         todo.updateStatus(!todo.getIsCompleted());
 
         return new TodoCompleteResponse(todo.getId(), todo.getIsCompleted());
